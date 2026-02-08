@@ -19,10 +19,12 @@ program
   .option('-c, --concurrency <n>', 'max concurrent requests', '10')
   .option('-t, --timeout <ms>', 'per-request timeout in ms', '10000')
   .option('-r, --max-redirects <n>', 'max redirects to follow per URL', '3')
+  .option('-d, --delay <ms>', 'delay in ms between requests', '0')
   .action(async (url: string, opts) => {
     const concurrency = parseInt(opts.concurrency, 10);
     const timeout = parseInt(opts.timeout, 10);
     const maxRedirects = parseInt(opts.maxRedirects, 10);
+    const delay = parseInt(opts.delay, 10);
     const verbose: boolean = opts.verbose ?? false;
     const csvPath: string | undefined = opts.csv;
 
@@ -65,6 +67,7 @@ program
         concurrency,
         timeout,
         maxRedirects,
+        delay,
         () => bar.increment(),
       );
 

@@ -118,11 +118,30 @@ describe('checkUrls', () => {
       ],
     };
 
-    const results = await checkUrls(sitemap, 2, 5000, 5, onProgress);
+    const results = await checkUrls(sitemap, 2, 5000, 5, 0, onProgress);
     expect(results).toHaveLength(3);
     expect(onProgress).toHaveBeenCalledTimes(3);
     for (const r of results) {
       expect(r.statusCode).toBe(200);
     }
+  });
+
+  it('applies delay between requests', async () => {
+    mockFetchByUrl(() => ({ status: 200 }));
+    const onProgress = vi.fn();
+    const sitemap = {
+      name: 'test',
+      urls: [
+        { loc: 'https://example.com/a' },
+        { loc: 'https://example.com/b' },
+      ],
+    };
+
+    const start = Date.now();
+    await checkUrls(sitemap, 1, 5000, 5, 50, onProgress);
+    const elapsed = Date.now() - start;
+
+    expect(elapsed).toBeGreaterThanOrEqual(40);
+    expect(onProgress).toHaveBeenCalledTimes(2);
   });
 });

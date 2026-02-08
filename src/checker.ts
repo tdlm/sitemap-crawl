@@ -54,17 +54,30 @@ export async function checkUrl(
   }
 }
 
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
 export async function checkUrls(
   sitemap: Sitemap,
   concurrency: number,
   timeout: number,
   maxRedirects: number,
+  delay: number,
   onProgress: () => void,
 ): Promise<UrlCheckResult[]> {
   const limit = pLimit(concurrency);
+  let first = true;
 
   const tasks = sitemap.urls.map((u) =>
     limit(async () => {
+      if (delay > 0) {
+        if (first) {
+          first = false;
+        } else {
+          await sleep(delay);
+        }
+      }
       const result = await checkUrl(u.loc, timeout, maxRedirects);
       onProgress();
       return result;
