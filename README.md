@@ -13,6 +13,7 @@ CLI tool that crawls sitemap XML files (indexes or single sitemaps), checks the 
 - Progress bars for each sitemap
 - CSV report export
 - Verbose mode with full URL listing
+- Zyte Smart Proxy Manager support
 
 ## Installation
 
@@ -45,6 +46,14 @@ pnpm crawl --csv report.csv https://www.sitemaps.org/sitemap.xml
 
 # Custom concurrency and timeout
 pnpm crawl -c 20 -t 5000 https://example.com/sitemap.xml
+
+# Crawl through Zyte Smart Proxy Manager (requires ZYTE_API_KEY in .env)
+cp .env.example .env
+# Edit .env and add your Zyte API key
+pnpm crawl https://example.com/sitemap.xml
+
+# Use a custom proxy URL
+pnpm crawl --proxy-url http://localhost:8011 https://example.com/sitemap.xml
 ```
 
 ## CLI Options
@@ -61,6 +70,8 @@ Options:
   -c, --concurrency <n>    max concurrent requests (default: 10)
   -t, --timeout <ms>       per-request timeout in ms (default: 10000)
   -r, --max-redirects <n>  max redirects to follow per URL (default: 3)
+  -d, --delay <ms>         delay in ms between requests (default: 10)
+  --proxy-url <url>        proxy URL for Zyte SPM (default: http://proxy.zyte.com:8011)
   -h, --help               display help
 ```
 
@@ -91,6 +102,25 @@ https://example.com/sitemap.xml
 
   Total: 3 URLs — 200: 2, 404: 1
 ```
+
+## Proxy Support
+
+To route requests through [Zyte Smart Proxy Manager](https://www.zyte.com/smart-proxy-manager/):
+
+1. Copy the example environment file:
+   ```bash
+   cp .env.example .env
+   ```
+2. Add your API key to `.env`:
+   ```
+   ZYTE_API_KEY=your-api-key-here
+   ```
+3. Run normally — the proxy is activated automatically when `ZYTE_API_KEY` is set:
+   ```bash
+   pnpm crawl https://example.com/sitemap.xml
+   ```
+
+The default proxy endpoint is `http://proxy.zyte.com:8011`. Override it with `--proxy-url` if needed.
 
 ## Requirements
 
