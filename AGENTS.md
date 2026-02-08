@@ -11,7 +11,7 @@ pnpm dev <url>    # Run in development mode with tsx
 
 ## Todos
 
-TODOS are available in TODOS.md
+TODOS are available in TODOS.md. Remove items from TODOS.md as they are completed.
 
 ## Architecture
 
