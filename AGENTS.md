@@ -9,6 +9,10 @@ pnpm crawl <url>  # Run compiled version
 pnpm dev <url>    # Run in development mode with tsx
 ```
 
+## Todos
+
+TODOS are available in TODOS.md
+
 ## Architecture
 
 ### Module Overview

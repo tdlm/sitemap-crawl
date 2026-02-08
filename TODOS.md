@@ -1,0 +1,2 @@
+- Add test suite
+- Add arg for a ms delay between requests
