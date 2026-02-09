@@ -58,13 +58,19 @@ function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+function isRetryable(result: UrlCheckResult): boolean {
+  return result.statusCode === 503 || result.statusCode === 0;
+}
+
 export async function checkUrls(
   sitemap: Sitemap,
   concurrency: number,
   timeout: number,
   maxRedirects: number,
   delay: number,
+  maxRetries: number,
   onProgress: () => void,
+  onRetryRound?: (attempt: number, count: number) => void,
 ): Promise<UrlCheckResult[]> {
   const limit = pLimit(concurrency);
   let first = true;
@@ -84,5 +90,30 @@ export async function checkUrls(
     }),
   );
 
-  return Promise.all(tasks);
+  const results = await Promise.all(tasks);
+
+  // Retry retryable errors (503, timeouts) at the end
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    const retryableIndices = results
+      .map((r, i) => (isRetryable(r) ? i : -1))
+      .filter((i) => i >= 0);
+
+    if (retryableIndices.length === 0) break;
+
+    onRetryRound?.(attempt, retryableIndices.length);
+
+    const retryTasks = retryableIndices.map((i) =>
+      limit(async () => {
+        if (delay > 0) await sleep(delay);
+        return { index: i, result: await checkUrl(results[i].url, timeout, maxRedirects) };
+      }),
+    );
+
+    const retryResults = await Promise.all(retryTasks);
+    for (const { index, result } of retryResults) {
+      results[index] = result;
+    }
+  }
+
+  return results;
 }

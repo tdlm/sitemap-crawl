@@ -1,2 +1,1 @@
 
-- Add retry functionality for errors (503, timeout) so there's enough time for the error to possibly recover -- maybe at the end of all the other requests up to a maxium of 3 times (configurable by a new argument with a default of 3)

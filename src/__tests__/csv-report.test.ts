@@ -3,6 +3,7 @@ import { generateCsv, writeCsvReport } from '../csv-report.js';
 import type { SitemapReport } from '../types.js';
 
 vi.mock('node:fs/promises', () => ({
+  mkdir: vi.fn(async () => {}),
   writeFile: vi.fn(async () => {}),
 }));
 

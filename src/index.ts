@@ -23,12 +23,14 @@ program
   .option('-t, --timeout <ms>', 'per-request timeout in ms', '10000')
   .option('-r, --max-redirects <n>', 'max redirects to follow per URL', '3')
   .option('-d, --delay <ms>', 'delay in ms between requests', '10')
+  .option('--max-retries <n>', 'max retries for 503/timeout errors', '3')
   .option('-p, --proxy-url [url]', 'enable Zyte proxy (optionally specify URL)', 'http://proxy.zyte.com:8011')
   .action(async (url: string, opts) => {
     const concurrency = parseInt(opts.concurrency, 10);
     const timeout = parseInt(opts.timeout, 10);
     const maxRedirects = parseInt(opts.maxRedirects, 10);
     const delay = parseInt(opts.delay, 10);
+    const maxRetries = parseInt(opts.maxRetries, 10);
     const verbose: boolean = opts.verbose ?? false;
     const csvPath: string | undefined = opts.csv
       ? join('reports', opts.csv)
@@ -82,7 +84,11 @@ program
         timeout,
         maxRedirects,
         delay,
+        maxRetries,
         () => bar.increment(),
+        (attempt, count) => {
+          console.log(chalk.yellow(`  Retry ${attempt}/${maxRetries}: ${count} URL(s) with retryable errors`));
+        },
       );
 
       bar.stop();

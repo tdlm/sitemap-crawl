@@ -118,12 +118,74 @@ describe('checkUrls', () => {
       ],
     };
 
-    const results = await checkUrls(sitemap, 2, 5000, 5, 0, onProgress);
+    const results = await checkUrls(sitemap, 2, 5000, 5, 0, 0, onProgress);
     expect(results).toHaveLength(3);
     expect(onProgress).toHaveBeenCalledTimes(3);
     for (const r of results) {
       expect(r.statusCode).toBe(200);
     }
+  });
+
+  it('retries 503 errors at the end', async () => {
+    let callCount = 0;
+    vi.stubGlobal('fetch', vi.fn(async (url: string) => {
+      callCount++;
+      // First call to /b returns 503, retry returns 200
+      if (url === 'https://example.com/b' && callCount <= 2) {
+        return { status: 503, headers: new Headers() };
+      }
+      return { status: 200, headers: new Headers() };
+    }));
+    const onProgress = vi.fn();
+    const onRetryRound = vi.fn();
+    const sitemap = {
+      name: 'test',
+      urls: [
+        { loc: 'https://example.com/a' },
+        { loc: 'https://example.com/b' },
+      ],
+    };
+
+    const results = await checkUrls(sitemap, 2, 5000, 5, 0, 3, onProgress, onRetryRound);
+    expect(results).toHaveLength(2);
+    expect(results[0].statusCode).toBe(200);
+    expect(results[1].statusCode).toBe(200);
+    expect(onRetryRound).toHaveBeenCalledWith(1, 1);
+  });
+
+  it('retries statusCode 0 (timeout) errors', async () => {
+    let callCount = 0;
+    vi.stubGlobal('fetch', vi.fn(async (url: string) => {
+      callCount++;
+      if (url === 'https://example.com/a' && callCount === 1) {
+        throw new Error('timeout');
+      }
+      return { status: 200, headers: new Headers() };
+    }));
+    const onProgress = vi.fn();
+    const sitemap = {
+      name: 'test',
+      urls: [{ loc: 'https://example.com/a' }],
+    };
+
+    const results = await checkUrls(sitemap, 1, 5000, 5, 0, 3, onProgress);
+    expect(results[0].statusCode).toBe(200);
+  });
+
+  it('stops retrying after maxRetries', async () => {
+    vi.stubGlobal('fetch', vi.fn(async () => {
+      return { status: 503, headers: new Headers() };
+    }));
+    const onProgress = vi.fn();
+    const onRetryRound = vi.fn();
+    const sitemap = {
+      name: 'test',
+      urls: [{ loc: 'https://example.com/a' }],
+    };
+
+    const results = await checkUrls(sitemap, 1, 5000, 5, 0, 2, onProgress, onRetryRound);
+    expect(results[0].statusCode).toBe(503);
+    expect(onRetryRound).toHaveBeenCalledTimes(2);
   });
 
   it('applies delay between requests', async () => {
@@ -138,7 +200,7 @@ describe('checkUrls', () => {
     };
 
     const start = Date.now();
-    await checkUrls(sitemap, 1, 5000, 5, 50, onProgress);
+    await checkUrls(sitemap, 1, 5000, 5, 50, 0, onProgress);
     const elapsed = Date.now() - start;
 
     expect(elapsed).toBeGreaterThanOrEqual(40);
