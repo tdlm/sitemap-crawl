@@ -1,4 +1,5 @@
-import { writeFile } from 'node:fs/promises';
+import { mkdir, writeFile } from 'node:fs/promises';
+import { dirname } from 'node:path';
 import { stringify } from 'csv-stringify/sync';
 import type { SitemapReport } from './types.js';
 
@@ -27,5 +28,6 @@ export async function writeCsvReport(
   filePath: string,
 ): Promise<void> {
   const csv = generateCsv(reports);
+  await mkdir(dirname(filePath), { recursive: true });
   await writeFile(filePath, csv, 'utf-8');
 }

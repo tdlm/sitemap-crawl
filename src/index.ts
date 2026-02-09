@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
 import 'dotenv/config';
+import { join } from 'node:path';
 import { Command } from 'commander';
 import chalk from 'chalk';
 import { fetchSitemaps } from './sitemap.js';
@@ -29,7 +30,9 @@ program
     const maxRedirects = parseInt(opts.maxRedirects, 10);
     const delay = parseInt(opts.delay, 10);
     const verbose: boolean = opts.verbose ?? false;
-    const csvPath: string | undefined = opts.csv;
+    const csvPath: string | undefined = opts.csv
+      ? join('reports', opts.csv)
+      : undefined;
 
     // Initialize proxy if ZYTE_API_KEY is set
     const apiKey = process.env.ZYTE_API_KEY;
