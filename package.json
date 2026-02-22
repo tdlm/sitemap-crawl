@@ -42,7 +42,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/tdlm/sitemap-crawler.git"
+    "url": "https://github.com/tdlm/sitemap-crawl.git"
   },
   "keywords": ["sitemap", "crawler", "cli", "seo", "link-checker"]
 }
