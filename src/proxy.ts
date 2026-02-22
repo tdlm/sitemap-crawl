@@ -11,5 +11,5 @@ export function initializeProxy(apiKey: string, proxyUrl: string): void {
   setGlobalDispatcher(agent);
   // Node 25+ ships its own fetch that ignores the npm undici dispatcher.
   // Replace global fetch with undici's so the proxy agent is actually used.
-  globalThis.fetch = undiciFetch as typeof globalThis.fetch;
+  globalThis.fetch = undiciFetch as unknown as typeof globalThis.fetch;
 }

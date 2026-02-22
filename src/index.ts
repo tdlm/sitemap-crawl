@@ -49,7 +49,7 @@ function safeCsvPath(input: string): string {
 const program = new Command();
 
 program
-  .name('sitemap-crawler')
+  .name('sitemap-crawl')
   .description('Crawl sitemap XML files and check HTTP status of every URL')
   .argument('<url>', 'URL to a sitemap XML or sitemap index XML')
   .option('-v, --verbose', 'show full URL listing instead of summary counts')

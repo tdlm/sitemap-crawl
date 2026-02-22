@@ -1,79 +1,62 @@
-# sitemap-crawler
+# sitemap-crawl
 
 CLI tool that crawls sitemap XML files (indexes or single sitemaps), checks the HTTP status of every URL, and reports results with pretty terminal output.
 
-## Features
-
-- Supports sitemap index files and single sitemaps
-- Handles gzipped (`.xml.gz`) sitemaps
-- Concurrent HTTP checking with configurable limits
-- HEAD-first requests with GET fallback
-- Manual redirect following with configurable max
-- Color-coded terminal output (2xx green, 3xx yellow, 4xx/5xx red)
-- Progress bars for each sitemap
-- CSV report export
-- Verbose mode with full URL listing
-- Zyte Smart Proxy Manager support
-
-## Installation
+## Install
 
 ```bash
-pnpm install
-pnpm build
+npm install -g sitemap-crawl
+# or
+pnpm add -g sitemap-crawl
+```
+
+Or run without installing:
+
+```bash
+npx sitemap-crawl <url>
 ```
 
 ## Usage
 
 ```bash
-# Run compiled version (requires pnpm build first)
-pnpm crawl <url>
-
-# Run in development mode (no build needed)
-pnpm dev <url>
+sitemap-crawl [options] <url>
 ```
 
 ### Examples
 
 ```bash
 # Basic crawl with summary output
-pnpm crawl https://www.sitemaps.org/sitemap.xml
+sitemap-crawl https://www.sitemaps.org/sitemap.xml
 
 # Verbose output showing every URL
-pnpm crawl -v https://www.sitemaps.org/sitemap.xml
+sitemap-crawl -v https://www.sitemaps.org/sitemap.xml
 
-# Export results to CSV
-pnpm crawl --csv report.csv https://www.sitemaps.org/sitemap.xml
+# Export results to CSV (writes to reports/<filename>)
+sitemap-crawl --csv report.csv https://www.sitemaps.org/sitemap.xml
 
 # Custom concurrency and timeout
-pnpm crawl -c 20 -t 5000 https://example.com/sitemap.xml
+sitemap-crawl -c 20 -t 5000 https://example.com/sitemap.xml
 
 # Crawl through Zyte Smart Proxy Manager (requires ZYTE_API_KEY in .env)
-cp .env.example .env
-# Edit .env and add your Zyte API key
-pnpm crawl https://example.com/sitemap.xml
+sitemap-crawl https://example.com/sitemap.xml
 
 # Use a custom proxy URL
-pnpm crawl -p http://localhost:8011 https://example.com/sitemap.xml
+sitemap-crawl -p http://localhost:8011 https://example.com/sitemap.xml
 ```
 
-## CLI Options
+## Options
 
-```
-Usage: sitemap-crawler [options] <url>
-
-Arguments:
-  url                      URL to a sitemap XML or sitemap index XML
-
-Options:
-  -v, --verbose            show full URL listing instead of summary counts
-  --csv <filepath>         write results to a CSV file
-  -c, --concurrency <n>    max concurrent requests (default: 10)
-  -t, --timeout <ms>       per-request timeout in ms (default: 10000)
-  -r, --max-redirects <n>  max redirects to follow per URL (default: 3)
-  -d, --delay <ms>         delay in ms between requests (default: 10)
-  -p, --proxy-url [url]    enable Zyte proxy, optionally specify URL (default: http://proxy.zyte.com:8011)
-  -h, --help               display help
-```
+| Flag | Description |
+|------|--------------|
+| `-v, --verbose` | Show full URL listing instead of summary counts |
+| `--csv <filepath>` | Write results to a CSV file (writes to `reports/<filename>`) |
+| `-c, --concurrency <n>` | Max concurrent requests (default: 10) |
+| `-t, --timeout <ms>` | Per-request timeout in ms (default: 10000) |
+| `-r, --max-redirects <n>` | Max redirects to follow per URL (default: 3) |
+| `-d, --delay <ms>` | Delay in ms between requests (default: 10) |
+| `--max-retries <n>` | Max retries for 503/timeout errors (default: 3) |
+| `-p, --proxy-url [url]` | Enable Zyte proxy, optionally specify URL (default: http://proxy.zyte.com:8011) |
+| `-h, --help` | Display help |
 
 ## Output
 
@@ -103,7 +86,20 @@ https://example.com/sitemap.xml
   Total: 3 URLs — 200: 2, 404: 1
 ```
 
-## Proxy Support
+## Features
+
+- Supports sitemap index files and single sitemaps
+- Handles gzipped (`.xml.gz`) sitemaps
+- Concurrent HTTP checking with configurable limits
+- HEAD-first requests with GET fallback
+- Manual redirect following with configurable max
+- Color-coded terminal output (2xx green, 3xx yellow, 4xx/5xx red)
+- Progress bars for each sitemap
+- CSV report export
+- Verbose mode with full URL listing
+- Zyte Smart Proxy Manager support
+
+## Proxy support
 
 To route requests through [Zyte Smart Proxy Manager](https://www.zyte.com/smart-proxy-manager/):
 
@@ -117,7 +113,7 @@ To route requests through [Zyte Smart Proxy Manager](https://www.zyte.com/smart-
    ```
 3. Run normally — the proxy is activated automatically when `ZYTE_API_KEY` is set:
    ```bash
-   pnpm crawl https://example.com/sitemap.xml
+   sitemap-crawl https://example.com/sitemap.xml
    ```
 
 The default proxy endpoint is `http://proxy.zyte.com:8011`. Override it with `--proxy-url` if needed.
@@ -125,3 +121,15 @@ The default proxy endpoint is `http://proxy.zyte.com:8011`. Override it with `--
 ## Requirements
 
 - Node.js 20+
+
+## Development
+
+```bash
+pnpm install
+pnpm build
+pnpm dev <url>   # Run in development mode (no build needed)
+```
+
+## License
+
+MIT

@@ -1,14 +1,17 @@
 {
-  "name": "sitemap-crawler",
+  "name": "sitemap-crawl",
   "version": "1.0.0",
   "description": "CLI tool that crawls sitemap XML files and checks HTTP status of every URL",
   "type": "module",
   "bin": {
-    "sitemap-crawler": "./dist/index.js"
+    "sitemap-crawl": "bin/sitemap-crawl.js"
   },
+  "files": ["dist", "bin"],
   "scripts": {
     "build": "tsc",
-    "crawl": "node dist/index.js",
+    "prepare": "pnpm run build",
+    "crawl": "node bin/sitemap-crawl.js",
+    "start": "node bin/sitemap-crawl.js",
     "dev": "tsx src/index.ts",
     "test": "vitest run",
     "test:watch": "vitest",
@@ -22,7 +25,7 @@
     "dotenv": "^17.2.4",
     "fast-xml-parser": "^4.4.0",
     "p-limit": "^6.1.0",
-    "undici": "^7.21.0"
+    "undici": "^6.21.0"
   },
   "devDependencies": {
     "@types/cli-progress": "^3.11.6",
@@ -33,6 +36,13 @@
     "vitest": "^4.0.18"
   },
   "engines": {
-    "node": ">=20.0.0"
-  }
+    "node": ">=18.0.0"
+  },
+  "author": "Scott Weaver <scottmweaver@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tdlm/sitemap-crawler.git"
+  },
+  "keywords": ["sitemap", "crawler", "cli", "seo", "link-checker"]
 }
